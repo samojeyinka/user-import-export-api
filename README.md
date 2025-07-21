@@ -30,7 +30,7 @@ A Laravel 12 REST API for user management with Excel import/export functionality
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/laravel-excel-user-api.git
+   git clone https://github.com/samojeyinka/laravel-excel-user-api.git
    cd laravel-excel-user-api
    ```
 
