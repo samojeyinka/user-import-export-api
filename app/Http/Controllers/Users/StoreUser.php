@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Users;
 
+use App\Http\Requests\StoreRegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -9,12 +10,9 @@ use App\Http\Controllers\Controller;
 
 class StoreUser extends Controller
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(StoreRegisterRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'password' => 'required|string|min:6',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'full_name' => $validated['full_name'],

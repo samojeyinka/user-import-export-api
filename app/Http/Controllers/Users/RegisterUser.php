@@ -1,29 +1,17 @@
 <?php
 namespace App\Http\Controllers\Users;
 
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Services\UserRegistrationService;
+use App\Http\Requests\StoreRegisterRequest;
 
 class RegisterUser extends Controller
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(StoreRegisterRequest $request, UserRegistrationService $registrationService): JsonResponse
     {
-        $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'password' => 'required|string|min:6',
-        ]);
-
-        $user = User::create([
-            'full_name' => $validated['full_name'],
-            'password' => $validated['password'], 
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Registration successful',
-            'user' => $user 
-        ], 201);
+        $result = $registrationService->register($request->validated());
+        
+        return response()->json($result, 201);
     }
 }

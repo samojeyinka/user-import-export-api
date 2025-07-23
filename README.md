@@ -1,61 +1,227 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Excel User API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel 12 REST API for user management with Excel import/export functionality. Register users, manage user data, and seamlessly import/export user information via Excel files (.xlsx/.xls).
 
-## About Laravel
+## ✨ Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **User Registration** - Register new users with validation
+- **User Management** - Retrieve all users with JSON API
+- **Excel Export** - Export user data to Excel format (.xlsx)
+- **Excel Import** - Bulk import users from Excel files
+- **RESTful API** - Clean and consistent API endpoints
+- **Data Validation** - Server-side validation for all inputs
+- **Error Handling** - Comprehensive error responses
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Laravel 12** - PHP framework
+- **Laravel Excel** (Maatwebsite) - Excel import/export package
+- **SQLite** - Database (easily configurable)
+- **PHP 8.2+** - Programming language
 
-## Learning Laravel
+## 📋 Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP ^8.2
+- Composer
+- Laravel 12
+- PHP Extensions: zip, xml, gd, iconv, simplexml, xmlreader, zlib
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🚀 Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/samojeyinka/laravel-excel-user-api.git
+   cd laravel-excel-user-api
+   ```
 
-## Laravel Sponsors
+2. **Install dependencies**
+   ```bash
+   composer install
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-### Premium Partners
+4. **Database setup**
+   ```bash
+   php artisan migrate
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+5. **Install Laravel Excel**
+   ```bash
+   composer require maatwebsite/excel
+   ```
 
-## Contributing
+6. **Start the server**
+   ```bash
+   php artisan serve
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The API will be available at `http://localhost:8000`
 
-## Code of Conduct
+## 📡 API Endpoints
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### User Registration
+```http
+POST /api/register
+Content-Type: application/json
 
-## Security Vulnerabilities
+{
+    "full_name": "John Doe",
+    "password": "password123"
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Response:**
+```json
+{
+    "success": true,
+    "message": "User registered successfully",
+    "user": {
+        "id": 1,
+        "full_name": "John Doe",
+        "created_at": "2025-07-21T23:16:24.000000Z",
+        "updated_at": "2025-07-21T23:16:24.000000Z"
+    }
+}
+```
 
-## License
+### Get All Users
+```http
+GET /api/users
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Response:**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": 1,
+            "full_name": "John Doe",
+            "created_at": "2025-07-21T23:16:24.000000Z",
+            "updated_at": "2025-07-21T23:16:24.000000Z"
+        }
+    ],
+    "count": 1
+}
+```
+
+### Export Users to Excel
+```http
+GET /api/users/export
+```
+
+Downloads an Excel file (`users.xlsx`) containing all user data.
+
+### Import Users from Excel
+```http
+POST /api/users/import
+Content-Type: multipart/form-data
+
+file: [Excel file (.xlsx or .xls)]
+```
+
+**Response:**
+```json
+{
+    "message": "Users imported successfully"
+}
+```
+
+## 📊 Excel File Format
+
+### For Import
+Your Excel file should have these columns:
+| full_name | password |
+|-----------|----------|
+| John Doe  | password123 |
+| Jane Smith| password456 |
+
+### Export Format
+Exported files contain:
+| ID | Full Name | Created At |
+|----|-----------|------------|
+| 1  | John Doe  | 2025-07-21 23:16:24 |
+
+## 🧪 Testing
+
+### Using cURL
+
+**Register a user:**
+```bash
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"full_name":"Test User","password":"password123"}'
+```
+
+**Get all users:**
+```bash
+curl -X GET http://localhost:8000/api/users
+```
+
+**Export users:**
+```bash
+curl -X GET http://localhost:8000/api/users/export --output users.xlsx
+```
+
+### Using Postman
+
+1. **Import Collection**: Import the API endpoints into Postman
+2. **File Upload**: For import endpoint, use form-data with file type
+3. **File Download**: Use "Save Response" for export endpoint
+
+## 🔧 Configuration
+
+### Database
+The project uses SQLite by default. To use MySQL or PostgreSQL:
+
+1. Update `.env` file:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+2. Run migrations:
+   ```bash
+   php artisan migrate
+   ```
+
+### Excel Configuration
+Publish Excel config (optional):
+```bash
+php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider" --tag=config
+```
+
+## 📁 Project Structure
+
+```
+app/
+├── Http/Controllers/
+│   └── UserController.php      # Main API controller
+├── Models/
+│   └── User.php               # User model
+├── Exports/
+│   └── UsersExport.php        # Excel export logic
+└── Imports/
+    └── UsersImport.php        # Excel import logic
+
+routes/
+└── api.php                    # API routes
+
+database/
+└── migrations/
+    └── create_users_table.php # Database schema
+```
+
+## 🛡️ Validation Rules
+
+### User Registration
+- `full_name`: Required, string, max 255 characters
