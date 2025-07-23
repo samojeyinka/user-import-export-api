@@ -11,10 +11,18 @@ class ImportUsers extends Controller
     public function __invoke(ImportUsersRequest $request, UserImportService $importService)
     {
         try {
-            $result = $importService->import($request->file('file'));
+            // Get current user for notifications (if authenticated)
+            $user = auth()->user();
+            
+            // Check if user wants to force queuing
+            if ($request->boolean('queue', false)) {
+                $result = $importService->forceQueue($request->file('file'), $user);
+            } else {
+                $result = $importService->import($request->file('file'), $user);
+            }
+            
             return response()->json($result);
         } catch (ValidationException $e) {
-      
             $failures = [];
             foreach ($e->failures() as $failure) {
                 $failures[] = [

@@ -15,7 +15,18 @@ class ImportUsersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|file|mimes:xlsx,xls|max:1024',
+            'file' => 'required|file|mimes:xlsx,xls|max:10240', 
+            'queue' => 'sometimes|boolean', 
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'file.required' => 'Please upload a file',
+            'file.mimes' => 'File must be an Excel file (.xlsx or .xls)',
+            'file.max' => 'File size cannot exceed 10MB',
+            'queue.boolean' => 'Queue parameter must be true or false',
         ];
     }
 
