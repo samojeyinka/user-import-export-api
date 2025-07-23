@@ -1,8 +1,16 @@
 <?php
 
-use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Users\IndexUser;
+use App\Http\Controllers\Users\StoreUser;
+use App\Http\Controllers\Users\RegisterUser;
+use App\Http\Controllers\Users\ImportUsers;
+use App\Http\Controllers\Users\ExportUsers;
 
-Route::post('/register', [UserController::class, 'register']);
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/export', [UserController::class, 'export']);
-Route::post('/users/import', [UserController::class, 'import']);
+Route::prefix('users')->group(function () {
+    Route::get('/', IndexUser::class)->name('users.index');
+    Route::post('/', StoreUser::class)->name('users.store');
+    Route::post('/register', RegisterUser::class)->name('users.register');
+    Route::get('/export', ExportUsers::class)->name('users.export');
+    Route::post('/import', ImportUsers::class)->name('users.import');
+});
