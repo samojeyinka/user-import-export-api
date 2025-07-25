@@ -11,19 +11,15 @@ class UserImportService
 {
     public function import(UploadedFile $file, $user = null): array
     {
-     
-        $shouldQueue = $file->getSize() > 5 * 1024; 
+        $shouldQueue = $file->getSize() > (5 * 1024 * 1024); 
         
-        if ($shouldQueue) {
-            return $this->queueImport($file, $user);
-        } else {
-            return $this->syncImport($file);
-        }
+        return $shouldQueue 
+            ? $this->queueImport($file, $user) 
+            : $this->syncImport($file);
     }
 
     protected function syncImport(UploadedFile $file): array
     {
-
         Excel::import(new UsersImport, $file);
         
         return [
@@ -35,17 +31,15 @@ class UserImportService
 
     protected function queueImport(UploadedFile $file, $user = null): array
     {
-
         $import = new QueuedUsersImport($user);
-        
         $pendingDispatch = $import->queue($file);
-        
+
         if ($user) {
             $pendingDispatch->chain([
                 new NotifyImportCompleted($user)
             ]);
         }
-        
+
         return [
             'success' => true,
             'message' => 'Large file detected. Import has been queued and will be processed in the background.',

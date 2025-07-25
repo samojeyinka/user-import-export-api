@@ -3,14 +3,25 @@
 namespace App\Exports;
 
 use App\Models\User;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UsersExport implements FromCollection, WithHeadings
+class UsersExport implements FromQuery, WithHeadings, ShouldQueue
 {
-    public function collection()
+    use Exportable;
+
+    protected $user;
+
+    public function __construct($user = null)
     {
-        return User::select('id', 'full_name', 'created_at')->get();
+        $this->user = $user;
+    }
+
+    public function query()
+    {
+        return User::query()->select('id', 'full_name', 'created_at');
     }
 
     public function headings(): array
@@ -20,5 +31,20 @@ class UsersExport implements FromCollection, WithHeadings
             'Full Name',
             'Created At'
         ];
+    }
+
+
+    public $queue = 'exports';
+
+
+    public $timeout = 300;
+
+    public function failed(\Throwable $exception): void
+    {
+        \Log::error('User export failed: ' . $exception->getMessage());
+
+        if ($this->user) {
+            $this->user->notify(new \App\Notifications\ExportFailedNotification());
+        }
     }
 }

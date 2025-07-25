@@ -1,15 +1,24 @@
 <?php
-
 namespace App\Http\Controllers\Users;
 
+use App\Services\UserExportService;
 use App\Exports\UsersExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExportUsers extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request, UserExportService $exportService)
     {
-        return Excel::download(new UsersExport, 'users.xlsx');
+        $result = $exportService->export(auth()->user(), $request->boolean('queue', false));
+        
+        if (!$result['success']) {
+            return response()->json($result, 422);
+        }
+        
+        return $result['queued'] 
+            ? response()->json($result)
+            : Excel::download(new UsersExport(auth()->user()), 'users.xlsx');
     }
 }

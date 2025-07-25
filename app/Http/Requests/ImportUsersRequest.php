@@ -2,8 +2,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Contracts\Validation\Validator;
 
 class ImportUsersRequest extends FormRequest
 {
@@ -15,8 +13,8 @@ class ImportUsersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|file|mimes:xlsx,xls|max:10240', 
-            'queue' => 'sometimes|boolean', 
+            'file' => 'required|file|mimes:xlsx,xls|max:10240',
+            'queue' => 'sometimes|boolean',
         ];
     }
 
@@ -25,19 +23,9 @@ class ImportUsersRequest extends FormRequest
         return [
             'file.required' => 'Please upload a file',
             'file.mimes' => 'File must be an Excel file (.xlsx or .xls)',
-            'file.max' => 'File size cannot exceed 10MB',
-            'queue.boolean' => 'Queue parameter must be true or false',
+            'file.max' => 'File size cannot exceed 5MB',
         ];
     }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422)
-        );
-    }
+    
+   
 }

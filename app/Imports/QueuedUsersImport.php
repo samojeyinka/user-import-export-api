@@ -8,13 +8,25 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Events\ImportFailed;
+use Maatwebsite\Excel\Events\AfterImport;
 use App\Notifications\ImportCompletedNotification;
 use App\Notifications\ImportFailedNotification;
 
-class QueuedUsersImport implements ToModel, WithHeadingRow, WithValidation, WithChunkReading, ShouldQueue, WithEvents
+class QueuedUsersImport implements 
+    ToModel, 
+    WithHeadingRow, 
+    WithValidation, 
+    WithChunkReading, 
+    ShouldQueue, 
+    WithEvents,
+    SkipsOnFailure
 {
+    use SkipsFailures;
+
     protected $user;
 
     public function __construct($user = null)
@@ -54,7 +66,7 @@ class QueuedUsersImport implements ToModel, WithHeadingRow, WithValidation, With
         ];
     }
 
-       public function chunkSize(): int
+    public function chunkSize(): int
     {
         return 500; 
     }
@@ -69,15 +81,45 @@ class QueuedUsersImport implements ToModel, WithHeadingRow, WithValidation, With
         return 120; 
     }
 
-   
     public function registerEvents(): array
     {
         return [
             ImportFailed::class => function(ImportFailed $event) {
                 if ($this->user) {
-                    $this->user->notify(new ImportFailedNotification());
+                    $this->user->notify(new ImportFailedNotification([
+                        'error' => $event->getException()->getMessage()
+                    ]));
+                }
+            },
+            
+            AfterImport::class => function(AfterImport $event) {
+                if ($this->user) {
+                    $failures = $this->failures();
+                    $hasFailures = count($failures) > 0;
+                    
+                    $this->user->notify(new ImportCompletedNotification([
+                        'has_failures' => $hasFailures,
+                        'failure_count' => count($failures),
+                        'failures' => $hasFailures ? $failures : null
+                    ]));
                 }
             },
         ];
+    }
+
+    
+    public function failed(\Throwable $exception)
+    {
+        \Log::error('Queued import job failed', [
+            'user_id' => $this->user?->id,
+            'error' => $exception->getMessage(),
+            'trace' => $exception->getTraceAsString()
+        ]);
+
+        if ($this->user) {
+            $this->user->notify(new ImportFailedNotification([
+                'error' => 'Import job failed: ' . $exception->getMessage()
+            ]));
+        }
     }
 }
