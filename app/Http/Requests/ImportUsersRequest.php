@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,6 +27,4 @@ class ImportUsersRequest extends FormRequest
             'file.max' => 'File size cannot exceed 5MB',
         ];
     }
-    
-   
 }

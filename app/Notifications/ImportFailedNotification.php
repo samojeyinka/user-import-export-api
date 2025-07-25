@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -30,7 +31,7 @@ class ImportFailedNotification extends Notification implements ShouldQueue
             ->line('Your user import has failed.');
 
         if (isset($this->data['error'])) {
-            $message->line('Error: ' . $this->data['error']);
+            $message->line('Error: '.$this->data['error']);
         }
 
         return $message
@@ -44,7 +45,7 @@ class ImportFailedNotification extends Notification implements ShouldQueue
             'message' => 'User import failed',
             'type' => 'import_failed',
             'error' => $this->data['error'] ?? null,
-            'timestamp' => now()
+            'timestamp' => now(),
         ];
     }
 }

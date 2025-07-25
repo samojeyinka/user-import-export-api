@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Notifications\ImportCompletedNotification;
@@ -21,6 +22,6 @@ class NotifyImportCompleted implements ShouldQueue
 
     public function handle()
     {
-        $this->user->notify(new ImportCompletedNotification());
+        $this->user->notify(new ImportCompletedNotification);
     }
 }

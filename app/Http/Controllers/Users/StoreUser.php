@@ -1,12 +1,11 @@
 <?php
+
 namespace App\Http\Controllers\Users;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRegisterRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 
 class StoreUser extends Controller
 {
@@ -22,7 +21,7 @@ class StoreUser extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User created successfully',
-            'user' => $user
+            'user' => $user,
         ], 201);
     }
 }

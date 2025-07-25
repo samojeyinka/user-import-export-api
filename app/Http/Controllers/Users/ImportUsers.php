@@ -1,9 +1,10 @@
 <?php
+
 namespace App\Http\Controllers\Users;
 
-use App\Services\UserImportService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ImportUsersRequest;
+use App\Services\UserImportService;
 use Maatwebsite\Excel\Validators\ValidationException;
 
 class ImportUsers extends Controller
@@ -14,21 +15,21 @@ class ImportUsers extends Controller
             $result = $request->boolean('queue', false)
                 ? $importService->forceQueue($request->file('file'), auth()->user())
                 : $importService->import($request->file('file'), auth()->user());
-                
+
             return response()->json($result);
-            
+
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Excel validation failed',
-                'failures' => collect($e->failures())->map(fn($failure) => [
+                'failures' => collect($e->failures())->map(fn ($failure) => [
                     'row' => $failure->row(),
                     'column' => $failure->attribute(),
                     'errors' => $failure->errors(),
-                    'values' => $failure->values()
-                ])
+                    'values' => $failure->values(),
+                ]),
             ], 422);
         }
-    
+
     }
 }

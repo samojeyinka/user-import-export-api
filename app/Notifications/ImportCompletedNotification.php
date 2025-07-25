@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -33,8 +34,8 @@ class ImportCompletedNotification extends Notification implements ShouldQueue
 
         if ($hasFailures) {
             $message->line("However, {$failureCount} rows failed to import due to validation errors.")
-                   ->line('The valid rows have been successfully imported.')
-                   ->line('Please review and correct the failed rows, then re-import if needed.');
+                ->line('The valid rows have been successfully imported.')
+                ->line('Please review and correct the failed rows, then re-import if needed.');
         } else {
             $message->line('All users have been imported successfully into the system.');
         }
@@ -48,14 +49,14 @@ class ImportCompletedNotification extends Notification implements ShouldQueue
         $failureCount = $this->data['failure_count'] ?? 0;
 
         return [
-            'message' => $hasFailures 
-                ? "User import completed with {$failureCount} failures" 
+            'message' => $hasFailures
+                ? "User import completed with {$failureCount} failures"
                 : 'User import completed successfully',
             'type' => $hasFailures ? 'import_partial' : 'import_success',
             'has_failures' => $hasFailures,
             'failure_count' => $failureCount,
             'failures' => $this->data['failures'] ?? null,
-            'timestamp' => now()
+            'timestamp' => now(),
         ];
     }
 }

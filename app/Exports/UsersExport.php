@@ -3,12 +3,12 @@
 namespace App\Exports;
 
 use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\Exportable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class UsersExport implements FromQuery, WithHeadings, ShouldQueue
+class UsersExport implements FromQuery, ShouldQueue, WithHeadings
 {
     use Exportable;
 
@@ -29,22 +29,20 @@ class UsersExport implements FromQuery, WithHeadings, ShouldQueue
         return [
             'ID',
             'Full Name',
-            'Created At'
+            'Created At',
         ];
     }
 
-
     public $queue = 'exports';
-
 
     public $timeout = 300;
 
     public function failed(\Throwable $exception): void
     {
-        \Log::error('User export failed: ' . $exception->getMessage());
+        \Log::error('User export failed: '.$exception->getMessage());
 
         if ($this->user) {
-            $this->user->notify(new \App\Notifications\ExportFailedNotification());
+            $this->user->notify(new \App\Notifications\ExportFailedNotification);
         }
     }
 }

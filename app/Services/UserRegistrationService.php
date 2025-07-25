@@ -1,8 +1,8 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class UserRegistrationService
 {
@@ -10,13 +10,13 @@ class UserRegistrationService
     {
         $user = User::create([
             'full_name' => $data['full_name'],
-            'password' => $data['password'], 
+            'password' => $data['password'],
         ]);
 
         return [
             'success' => true,
             'message' => 'Registration successful',
-            'user' => $user
+            'user' => $user,
         ];
     }
 }

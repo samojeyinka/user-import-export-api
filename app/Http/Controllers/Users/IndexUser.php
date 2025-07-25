@@ -1,9 +1,10 @@
 <?php
+
 namespace App\Http\Controllers\Users;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 
 class IndexUser extends Controller
 {
@@ -11,15 +12,16 @@ class IndexUser extends Controller
     {
         try {
             $users = User::all();
+
             return response()->json([
                 'success' => true,
                 'data' => $users,
-                'count' => $users->count()
+                'count' => $users->count(),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching users: ' . $e->getMessage()
+                'message' => 'Error fetching users: '.$e->getMessage(),
             ], 500);
         }
     }

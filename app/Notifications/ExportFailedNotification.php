@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -18,16 +19,16 @@ class ExportFailedNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('User Export Failed')
-                    ->line('Your user export has failed.')
-                    ->line('Please try again or contact support if the issue persists.');
+            ->subject('User Export Failed')
+            ->line('Your user export has failed.')
+            ->line('Please try again or contact support if the issue persists.');
     }
 
     public function toDatabase($notifiable)
     {
         return [
             'message' => 'User export failed',
-            'type' => 'export_failed'
+            'type' => 'export_failed',
         ];
     }
 }

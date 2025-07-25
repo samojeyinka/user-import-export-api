@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Jobs;
 
 use App\Notifications\ExportCompletedNotification;
@@ -13,6 +14,7 @@ class NotifyExportCompleted implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $user;
+
     protected $filename;
 
     public function __construct($user, $filename)

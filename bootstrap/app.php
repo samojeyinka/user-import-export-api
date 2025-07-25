@@ -15,8 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        
-   
+
         $exceptions->render(function (ValidationException $e, $request) {
             if ($request->expectsJson()) {
                 $failures = [];
@@ -25,24 +24,23 @@ return Application::configure(basePath: dirname(__DIR__))
                         'row' => $failure->row(),
                         'column' => $failure->attribute(),
                         'errors' => $failure->errors(),
-                        'values' => $failure->values()
+                        'values' => $failure->values(),
                     ];
                 }
 
                 return response()->json([
                     'success' => false,
                     'message' => 'Excel validation failed',
-                    'failures' => $failures
+                    'failures' => $failures,
                 ], 422);
             }
         });
 
-    
         $exceptions->render(function (\Throwable $e, $request) {
             if ($request->expectsJson() && str_contains($request->getPathInfo(), 'import')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Import failed: ' . $e->getMessage(),
+                    'message' => 'Import failed: '.$e->getMessage(),
                 ], 500);
             }
         });

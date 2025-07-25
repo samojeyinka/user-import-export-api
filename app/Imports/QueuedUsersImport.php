@@ -1,29 +1,23 @@
 <?php
+
 namespace App\Imports;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
-use Maatwebsite\Excel\Concerns\SkipsFailures;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Maatwebsite\Excel\Events\ImportFailed;
-use Maatwebsite\Excel\Events\AfterImport;
 use App\Notifications\ImportCompletedNotification;
 use App\Notifications\ImportFailedNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Events\AfterImport;
+use Maatwebsite\Excel\Events\ImportFailed;
 
-class QueuedUsersImport implements 
-    ToModel, 
-    WithHeadingRow, 
-    WithValidation, 
-    WithChunkReading, 
-    ShouldQueue, 
-    WithEvents,
-    SkipsOnFailure
+class QueuedUsersImport implements ShouldQueue, SkipsOnFailure, ToModel, WithChunkReading, WithEvents, WithHeadingRow, WithValidation
 {
     use SkipsFailures;
 
@@ -38,7 +32,7 @@ class QueuedUsersImport implements
     {
         return new User([
             'full_name' => $row['full_name'] ?? null,
-            'password' => Hash::make($row['password'] ?? 'defaultpassword'), 
+            'password' => Hash::make($row['password'] ?? 'defaultpassword'),
         ]);
     }
 
@@ -68,57 +62,56 @@ class QueuedUsersImport implements
 
     public function chunkSize(): int
     {
-        return 500; 
+        return 500;
     }
 
     public function queue(): string
     {
-        return 'imports'; 
+        return 'imports';
     }
 
     public function timeout(): int
     {
-        return 120; 
+        return 120;
     }
 
     public function registerEvents(): array
     {
         return [
-            ImportFailed::class => function(ImportFailed $event) {
+            ImportFailed::class => function (ImportFailed $event) {
                 if ($this->user) {
                     $this->user->notify(new ImportFailedNotification([
-                        'error' => $event->getException()->getMessage()
+                        'error' => $event->getException()->getMessage(),
                     ]));
                 }
             },
-            
-            AfterImport::class => function(AfterImport $event) {
+
+            AfterImport::class => function (AfterImport $event) {
                 if ($this->user) {
                     $failures = $this->failures();
                     $hasFailures = count($failures) > 0;
-                    
+
                     $this->user->notify(new ImportCompletedNotification([
                         'has_failures' => $hasFailures,
                         'failure_count' => count($failures),
-                        'failures' => $hasFailures ? $failures : null
+                        'failures' => $hasFailures ? $failures : null,
                     ]));
                 }
             },
         ];
     }
 
-    
     public function failed(\Throwable $exception)
     {
         \Log::error('Queued import job failed', [
             'user_id' => $this->user?->id,
             'error' => $exception->getMessage(),
-            'trace' => $exception->getTraceAsString()
+            'trace' => $exception->getTraceAsString(),
         ]);
 
         if ($this->user) {
             $this->user->notify(new ImportFailedNotification([
-                'error' => 'Import job failed: ' . $exception->getMessage()
+                'error' => 'Import job failed: '.$exception->getMessage(),
             ]));
         }
     }
